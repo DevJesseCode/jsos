@@ -2,6 +2,7 @@ const canvas = document.createElement("canvas")
 const gui = document.querySelector(".interface")
 const taskbar = document.querySelector(".taskbar")
 const filesystem = new Filesystem("apps", "jsos")
+let maxZIndex = 1
 let temp;
 filesystem.write({
 	name: "config", type: "folder", contents: new Map([

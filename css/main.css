@@ -46,17 +46,22 @@ body {
     transition-duration: .40s;
 }
 
-[appWindow=true] {
+[appWindowContainer=true] {
     position: absolute;
     padding-top: 20px;
-    background-image: linear-gradient(to bottom right, hsl(230, 100%, 78%), hsl(208, 100%, 24%));
-    border: 2px solid hsl(208, 100%, 24%);
+    background-image: linear-gradient(to bottom right, hsl(230, 100%, 78%), hsl(133, 100%, 24%));
+    border-radius: 10px;
+}
+
+[appWindow=true] {
+    border: none;
 }
 
 .taskbar-icon {
     width: 40px;
     aspect-ratio: 1;
     cursor: pointer;
+    margin-right: 5px;
     transition-duration: .3s;
 }
 

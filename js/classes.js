@@ -183,14 +183,27 @@ class App {
             }
         }
         const { width, height, execFile } = this.runOptions
+        const appWindowContainer = document.createElement("div")
         const appWindow = document.createElement("iframe")
         appWindow.src = this.fs.read(execFile, `storage/apps/${this.name}`)
+        appWindowContainer.setAttribute("appWindowContainer", "true")
         appWindow.setAttribute("appWindow", "true")
-        appWindow.style.top = `${30 + offset}px`
-        appWindow.style.left = `${30 + offset}px`
+        appWindowContainer.style.top = `${30 + offset}px`
+        appWindowContainer.style.left = `${30 + offset}px`
+        appWindowContainer.style.zIndex = maxZIndex
+        appWindow.style.borderBottomLeftRadius = `10px`
+        appWindow.style.borderBottomRightRadius = `10px`
         appWindow.height = height
         appWindow.width = width
-        gui.appendChild(appWindow)
+        appWindowContainer.addEventListener("click", (event) => {
+            document.querySelectorAll("[appWindowContainer=true]").forEach((window) => {
+                window.style.zIndex--
+            })
+            event.target.style.zIndex = maxZIndex
+        })
+        maxZIndex++
+        appWindowContainer.appendChild(appWindow)
+        gui.appendChild(appWindowContainer)
         if (!gui.running[this.name]) {
             gui.running[this.name] = []
         }
@@ -210,6 +223,9 @@ class App {
         } else {
             appIconElement.src = "./img/default/app-icon.svg"
         }
+        appIconElement.addEventListener("click", () => {
+            this.run()
+        })
         taskbar.appendChild(appIconElement)
         this.installed = true
     }

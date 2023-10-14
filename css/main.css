@@ -1,0 +1,66 @@
+body {
+    width: 100vw;
+    height: 100vh;
+    background-image: linear-gradient(to bottom right, hsl(350, 100%, 78%), hsl(328, 100%, 24%));
+    overflow: hidden;
+    margin: 0;
+}
+
+.interface {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.taskbar {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 100vw;
+    height: 50px;
+    background-image: linear-gradient(to bottom right, hsl(230, 100%, 17%), hsl(208, 100%, 7%));
+    padding-left: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.context-menu {
+    position: absolute;
+    min-width: 300px;
+    max-width: 400px;
+    background-color: rgb(214, 214, 214);
+    border-radius: 10px;
+    padding: 10px 0px;
+}
+
+.cm-option {
+    cursor: pointer;
+    font: 400 16px "Segoe UI";
+    margin: 0;
+    transition-duration: .40s;
+    padding-left: 10px;
+}
+
+.cm-option:hover {
+    background-color: #00000020;
+    transition-duration: .40s;
+}
+
+[appWindow=true] {
+    position: absolute;
+    padding-top: 20px;
+    background-image: linear-gradient(to bottom right, hsl(230, 100%, 78%), hsl(208, 100%, 24%));
+    border: 2px solid hsl(208, 100%, 24%);
+}
+
+.taskbar-icon {
+    width: 40px;
+    aspect-ratio: 1;
+    cursor: pointer;
+    transition-duration: .3s;
+}
+
+.taskbar-icon:hover {
+    opacity: 0.5;
+    transition-duration: .3s;
+}

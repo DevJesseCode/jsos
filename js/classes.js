@@ -185,23 +185,124 @@ class App {
         const { width, height, execFile } = this.runOptions
         const appWindowContainer = document.createElement("div")
         const appWindow = document.createElement("iframe")
+        const windowIcon = document.createElement("img")
+        windowIcon.src = this.appIcon
+        windowIcon.classList.add("window-icon")
         appWindow.src = this.fs.read(execFile, `storage/apps/${this.name}`)
         appWindowContainer.setAttribute("appWindowContainer", "true")
         appWindow.setAttribute("appWindow", "true")
-        appWindowContainer.style.top = `${30 + offset}px`
-        appWindowContainer.style.left = `${30 + offset}px`
+        appWindowContainer.style.top = `${20 + offset}px`
+        appWindowContainer.style.left = `${20 + offset}px`
         appWindowContainer.style.zIndex = maxZIndex
-        appWindow.style.borderBottomLeftRadius = `10px`
-        appWindow.style.borderBottomRightRadius = `10px`
+        appWindowContainer.setAttribute("zIndex", `'${maxZIndex}'`)
+        appWindowContainer.setAttribute("draggable", `true`)
         appWindow.height = height
         appWindow.width = width
-        appWindowContainer.addEventListener("click", (event) => {
-            document.querySelectorAll("[appWindowContainer=true]").forEach((window) => {
-                window.style.zIndex--
+        appWindow.__proto__.connectedCallback = () => {
+            appWindow.load(appWindow.src)
+            appWindow.src = ''
+            appWindow.sandbox = '' + appWindow.sandbox || 'allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation-by-user-activation' // all except allow-top-navigation
+        }
+        appWindow.__proto__.load = (url, options) => {
+            if (!url || !url.startsWith('http'))
+                throw new Error(`X-Frame-Bypass src ${url} does not start with http(s)://`)
+            console.log('X-Frame-Bypass loading:', url)
+            appWindow.src = url
+            appWindow.srcdoc = `<html>
+        <head>
+            <style>
+            .loader {
+                position: absolute;
+                top: calc(50% - 25px);
+                left: calc(50% - 25px);
+                width: 50px;
+                height: 50px;
+                background-color: #333;
+                border-radius: 50%;  
+                animation: loader 1s infinite ease-in-out;
+            }
+            @keyframes loader {
+                0% {
+                transform: scale(0);
+                }
+                100% {
+                transform: scale(1);
+                opacity: 0;
+                }
+            }
+            </style>
+        </head>
+        <body>
+            <div class="loader"></div>
+        </body>
+        </html>`
+            appWindow.fetchProxy(url, options, 0).then(res => res.text()).then(data => {
+                if (data)
+                    appWindow.srcdoc = data.replace(/<head([^>]*)>/i, `<head$1>
+            <base href="${url}">
+            <script>
+            // X-Frame-Bypass navigation event handlers
+            document.addEventListener('click', e => {
+                if (frameElement && document.activeElement && document.activeElement.href) {
+                    e.preventDefault()
+                    frameElement.src = document.activeElement.href
+                    frameElement.load(document.activeElement.href)
+                }
             })
-            event.target.style.zIndex = maxZIndex
+            document.addEventListener('submit', e => {
+                if (frameElement && document.activeElement && document.activeElement.form && document.activeElement.form.action) {
+                    e.preventDefault()
+                    if (document.activeElement.form.method === 'post')
+                        frameElement.load(document.activeElement.form.action, {method: 'post', body: new FormData(document.activeElement.form)})
+                    else
+                        frameElement.src = document.activeElement.form.action + '?' + new URLSearchParams(new FormData(document.activeElement.form))
+                        frameElement.load(document.activeElement.form.action + '?' + new URLSearchParams(new FormData(document.activeElement.form)))
+                }
+            })
+            if (frameElement.src === "https://www.google.com" ||
+                frameElement.src === "https://www.google.com/") {
+                document.querySelector("[name=btnK]").addEventListener("click", () => {
+                    let searchTerm = document.querySelector("[name=q]").value
+                    let searchLink
+                    searchTerm = searchTerm.replace(" ", "+")
+                    searchTerm = encodeURIComponent(searchTerm)
+                    searchLink = "https://www.google.com/search?q=" + searchTerm
+                    frameElement.src = searchLink
+                    frameElement.load(searchLink)
+                })
+            }
+            </script>`)
+            }).catch(e => console.error('Cannot load X-Frame-Bypass:', e))
+        }
+        appWindow.__proto__.fetchProxy = (url, options, i) => {
+            const proxy = [
+                'https://cors.io/?',
+                'https://cors-anywhere.herokuapp.com/',
+                'https://api.allorigins.win/raw?url=',
+                'https://jsonp.afeld.me/?url=',
+            ]
+            return fetch(proxy[i] + url, options).then(res => {
+                if (!res.ok)
+                    throw new Error(`${res.status} ${res.statusText}`);
+                return res
+            }).catch(error => {
+                if (i === proxy.length - 1)
+                    throw error
+                return appWindow.fetchProxy(url, options, i + 1)
+            })
+        }
+        if (appWindow.src.startsWith("http")) {
+            appWindow.load(appWindow.src)
+        }
+        appWindowContainer.addEventListener("click", switchWindow)
+        appWindowContainer.addEventListener("drag", event => {
+            if (event.clientX || event.clientY) {
+                event.target.style.top = `${event.clientY}px`
+                event.target.style.left = `${event.clientX}px`
+            }
         })
         maxZIndex++
+        appWindowContainer.appendChild(windowIcon)
         appWindowContainer.appendChild(appWindow)
         gui.appendChild(appWindowContainer)
         if (!gui.running[this.name]) {
@@ -214,15 +315,8 @@ class App {
         const appIconElement = document.createElement("img")
         appIconElement.classList.add("taskbar-icon")
         appIconElement.setAttribute("app", this.name)
-        if (this.appIcon) {
-            if (!this.appIcon.indexOf("https://") || !this.appIcon.indexOf("./")) {
-                appIconElement.src = this.appIcon
-            } else {
-                appIconElement.src = "data:image/svg," + encodeURIComponent(this.appIcon)
-            }
-        } else {
-            appIconElement.src = "./img/default/app-icon.svg"
-        }
+        appIconElement.src = this.appIcon || "./img/default/app-icon.svg"
+        appIconElement.title = this.name
         appIconElement.addEventListener("click", () => {
             this.run()
         })

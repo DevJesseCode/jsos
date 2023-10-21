@@ -189,13 +189,12 @@ class App {
         windowIcon.src = this.appIcon
         windowIcon.classList.add("window-icon")
         appWindow.src = this.fs.read(execFile, `storage/apps/${this.name}`)
-        appWindowContainer.setAttribute("appWindowContainer", "true")
-        appWindow.setAttribute("appWindow", "true")
+        appWindowContainer.setAttribute("appwindowcontainer", "true")
+        appWindow.setAttribute("appwindow", "true")
         appWindowContainer.style.top = `${20 + offset}px`
         appWindowContainer.style.left = `${20 + offset}px`
         appWindowContainer.style.zIndex = maxZIndex
         appWindowContainer.setAttribute("zIndex", `'${maxZIndex}'`)
-        appWindowContainer.setAttribute("draggable", `true`)
         appWindow.height = height
         appWindow.width = width
         appWindow.__proto__.connectedCallback = () => {
@@ -295,12 +294,6 @@ class App {
             appWindow.load(appWindow.src)
         }
         appWindowContainer.addEventListener("click", switchWindow)
-        appWindowContainer.addEventListener("drag", event => {
-            if (event.clientX || event.clientY) {
-                event.target.style.top = `${event.clientY}px`
-                event.target.style.left = `${event.clientX}px`
-            }
-        })
         maxZIndex++
         appWindowContainer.appendChild(windowIcon)
         appWindowContainer.appendChild(appWindow)

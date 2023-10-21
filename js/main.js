@@ -132,9 +132,9 @@ const apps = {
 }
 
 gui.addEventListener("mousedown", (event) => {
-	const isAppWindow = event.target.getAttribute("appWindow");
-	if (isAppWindow) {
-		activeWindow = event.target.parentElement;
+	const isAppWindowContainer = event.target.getAttribute("appwindowcontainer");
+	if (isAppWindowContainer) {
+		activeWindow = event.target;
 		offsetX = event.clientX - activeWindow.getBoundingClientRect().left;
 		offsetY = event.clientY - activeWindow.getBoundingClientRect().top;
 		activeWindow.style.zIndex = maxZIndex++;

@@ -295,12 +295,6 @@ class App {
             appWindow.load(appWindow.src)
         }
         appWindowContainer.addEventListener("click", switchWindow)
-        appWindowContainer.addEventListener("drag", event => {
-            if (event.clientX || event.clientY) {
-                event.target.style.top = `${event.clientY}px`
-                event.target.style.left = `${event.clientX}px`
-            }
-        })
         maxZIndex++
         appWindowContainer.appendChild(windowIcon)
         appWindowContainer.appendChild(appWindow)

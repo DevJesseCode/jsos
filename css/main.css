@@ -36,7 +36,7 @@ body {
 
 .cm-option {
     cursor: pointer;
-    font: 400 16px "Segoe UI";
+    font: 400 15px "Segoe UI";
     margin: 0;
     transition-duration: .40s;
     padding-left: 10px;

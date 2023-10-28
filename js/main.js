@@ -137,7 +137,11 @@ gui.addEventListener("mousedown", (event) => {
 		activeWindow = event.target;
 		offsetX = event.clientX - activeWindow.getBoundingClientRect().left;
 		offsetY = event.clientY - activeWindow.getBoundingClientRect().top;
-		activeWindow.style.zIndex = maxZIndex++;
+		try {
+			switchWindow(event)
+		} catch (error) {
+			console.log(error)
+		}
 		document.addEventListener("mousemove", handleWindowDrag);
 	}
 });

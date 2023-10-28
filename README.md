@@ -7,6 +7,6 @@ An operating system that runs in the browser based on just HTML, CSS, and of cou
 
 ## Special thanks
 I say a big thank you to:
-<a href="https://github.com/niutech">niutech</a> for created X-Frame-Bypass which is used to allow embedding of CORS-protected sites
+<a href="https://github.com/niutech">niutech</a> for creating X-Frame-Bypass which is used to allow embedding of CORS-protected sites
 
 ## Changelog

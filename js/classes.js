@@ -1,4 +1,4 @@
-class Filesystem {
+﻿class Filesystem {
     constructor(...topLevelFolders) {
         this.dir = {
             storage: {
@@ -275,6 +275,7 @@ class App {
         }
         appWindow.__proto__.fetchProxy = (url, options, i) => {
             const proxy = [
+		'http://127.0.0.1:8080/',
                 'https://cors.io/?',
                 'https://cors-anywhere.herokuapp.com/',
                 'https://api.allorigins.win/raw?url=',

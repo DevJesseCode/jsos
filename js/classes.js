@@ -1,4 +1,4 @@
-﻿class Filesystem {
+class Filesystem {
     constructor(...topLevelFolders) {
         this.dir = {
             storage: {
@@ -247,6 +247,22 @@ class App {
                     frameElement.src = document.activeElement.href
                     frameElement.load(document.activeElement.href)
                 }
+                if (frameElement && 
+                    (frameElement.src === "https://www.google.com" ||
+                    frameElement.src === "https://www.google.com/")) {
+                        const buttonBounding = document.querySelector("[name=btnK]").getBoundingClientRect()
+                        if (e.x >= buttonBounding.x && e.x <= buttonBounding.right &&
+                            e.y >= buttonBounding.y && e.y <= buttonBounding.bottom) {
+                            e.preventDefault()
+                            let searchTerm = document.querySelector("[name=q]").value
+                            let searchLink
+                            searchTerm = searchTerm.replace(" ", "+")
+                            searchTerm = encodeURIComponent(searchTerm)
+                            searchLink = "https://www.google.com/search?q=" + searchTerm
+                            frameElement.src = searchLink
+                            frameElement.load(searchLink)
+                        }
+                }
             })
             document.addEventListener('submit', e => {
                 if (frameElement && document.activeElement && document.activeElement.form && document.activeElement.form.action) {
@@ -258,30 +274,19 @@ class App {
                         frameElement.load(document.activeElement.form.action + '?' + new URLSearchParams(new FormData(document.activeElement.form)))
                 }
             })
-            if (frameElement.src === "https://www.google.com" ||
-                frameElement.src === "https://www.google.com/") {
-                document.querySelector("[name=btnK]").addEventListener("click", () => {
-                    let searchTerm = document.querySelector("[name=q]").value
-                    let searchLink
-                    searchTerm = searchTerm.replace(" ", "+")
-                    searchTerm = encodeURIComponent(searchTerm)
-                    searchLink = "https://www.google.com/search?q=" + searchTerm
-                    frameElement.src = searchLink
-                    frameElement.load(searchLink)
-                })
-            }
             </script>`)
             }).catch(e => console.error('Cannot load X-Frame-Bypass:', e))
         }
         appWindow.__proto__.fetchProxy = (url, options, i) => {
             const proxy = [
-		'http://127.0.0.1:8080/',
+                'http://127.0.0.1:8080/',
+                'https://api.allorigins.win/get?url=',
                 'https://cors.io/?',
                 'https://cors-anywhere.herokuapp.com/',
                 'https://api.allorigins.win/raw?url=',
                 'https://jsonp.afeld.me/?url=',
             ]
-            return fetch(proxy[i] + url, options).then(res => {
+            return fetch(proxy[i] + (i === 1 ? encodeURIComponent(url) : url), options).then(res => {
                 if (!res.ok)
                     throw new Error(`${res.status} ${res.statusText}`);
                 return res

@@ -4,21 +4,13 @@ const taskbar = document.querySelector(".taskbar")
 const filesystem = new Filesystem("apps", "jsos")
 let maxZIndex = 1
 let activeWindow = null
-let offsetX, offsetY
+let offsetX, offsetY, initX, initY;
 let temp;
 filesystem.write({
 	name: "config", type: "folder", contents: new Map([
 		["config.json", { type: "application/json", contents: '{}' }]
 	])
-}, "storage/jsos/")
-const clicks = {
-	cm: {
-		// count: 0,
-		// interval: setInterval(() => {
-		// 	clicks.cm.count = 0
-		// }, 500)
-	}
-}
+}, "storage/jsos/");
 const createContextMenu = (x, y) => {
 	const cm = document.createElement("div")
 	cm.classList.add("context-menu")
@@ -84,10 +76,10 @@ const switchWindow = ({ target }) => {
 	target.style.zIndex = maxZIndex - 1
 	target.setAttribute("zIndex", `'${maxZIndex - 1}'`)
 }
-const handleWindowDrag = event => {
+const handleWindowDrag = ({ pageX, pageY }) => {
 	if (activeWindow) {
-		activeWindow.style.left = event.clientX - offsetX + "px";
-		activeWindow.style.top = event.clientY - offsetY + "px";
+		activeWindow.style.left = `${initX + (pageX - offsetX)}px`;
+		activeWindow.style.top = `${initY + (pageY - offsetY)}px`;
 	}
 }
 const apps = {
@@ -131,17 +123,14 @@ const apps = {
 	})
 }
 
-gui.addEventListener("mousedown", (event) => {
+gui.addEventListener("mousedown", ({ x, y, target }) => {
 	const isAppWindowContainer = event.target.getAttribute("appwindowcontainer");
 	if (isAppWindowContainer) {
-		activeWindow = event.target;
-		offsetX = event.clientX - activeWindow.getBoundingClientRect().left;
-		offsetY = event.clientY - activeWindow.getBoundingClientRect().top;
-		try {
-			switchWindow(event)
-		} catch (error) {
-			console.log(error)
-		}
+		offsetX = x;
+		offsetY = y;
+		initX = parseInt(target.style.left) || 0;
+		initY = parseInt(target.style.top) || 0;
+		activeWindow = target;
 		document.addEventListener("mousemove", handleWindowDrag);
 	}
 });
@@ -153,7 +142,7 @@ document.addEventListener("mouseup", () => {
 	activeWindow = null;
 });
 
-gui.addEventListener("auxclick", (event) => {
+gui.addEventListener("contextmenu", (event) => {
 	event.preventDefault()
 	if (document.querySelectorAll(".context-menu")) {
 		for (let element of document.querySelectorAll(".context-menu")) {
